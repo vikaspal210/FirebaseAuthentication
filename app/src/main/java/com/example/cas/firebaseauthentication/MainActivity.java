@@ -122,6 +122,34 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Intent signInIntent=mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent,RC_SIGN_IN);
     }
+    //signOut method
+    private void signOut(){
+        //Firebase sign out
+        mAuth.signOut();
+
+        //Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI(null);
+                    }
+                });
+    }
+    //revokeAccess method
+    private void revokeAccess() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google revoke access
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI(null);
+                    }
+                });
+    }
 
     private void updateUI(FirebaseUser currentLoggedUser){
         hideProgressDialog();
@@ -144,6 +172,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         int i=v.getId();
         if(i==R.id.sign_in_button){
-            signIn();}
+            signIn();
+        }else if(i==R.id.sign_out_button){
+            signOut();
+        }else if(i==R.id.disconnect_button){
+            revokeAccess();
+        }
     }
 }
