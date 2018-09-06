@@ -2,14 +2,12 @@ package com.example.cas.firebaseauthentication;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -22,9 +20,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class GoogleSignIn extends BaseActivity implements View.OnClickListener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "GoogleSignIn";
     private static final int RC_SIGN_IN = 9001;
     //declare instance of FirebaseAuth
     private FirebaseAuth mAuth;
@@ -37,7 +35,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.in_sign_google);
 
         // Views
         mStatusTextView = findViewById(R.id.status);
@@ -55,7 +53,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 .requestEmail()
                 .build();
 
-        mGoogleSignInClient= GoogleSignIn.getClient(this,googleSignInOptions);
+        mGoogleSignInClient= com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(this,googleSignInOptions);
         mAuth=FirebaseAuth.getInstance();
     }
 
@@ -76,7 +74,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if(requestCode==RC_SIGN_IN){
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            Task<GoogleSignInAccount> task = com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
@@ -109,7 +107,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         }else{
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GoogleSignIn.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
                         hideProgressDialog();
