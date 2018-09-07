@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".GoogleSignIn" />
+        <activity android:name=".GoogleSignIn"
+            android:label="GoogleSignIn"/>
         <activity android:name=".BaseActivity" />
         <activity android:name=".ChooserActivity">
             <intent-filter>
@@ -18,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PhoneAuthActivity"></activity>
+        <activity android:name=".PhoneAuthActivity"
+            android:label="PhoneAuthActivity"/>
     </application>
 
 </manifest>

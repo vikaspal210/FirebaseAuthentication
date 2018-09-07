@@ -59,7 +59,7 @@
                 android:weightSum="2.0">
 
                 <EditText
-                    android:id="@+id/field_phone_number"
+                    android:id="@+id/edittext_phone_number"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.0"
@@ -67,7 +67,7 @@
                     android:inputType="phone" />
 
                 <EditText
-                    android:id="@+id/field_verification_code"
+                    android:id="@+id/edittext_otp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.0"
@@ -83,14 +83,14 @@
                 android:weightSum="3.0">
 
                 <Button
-                    android:id="@+id/button_start_verification"
+                    android:id="@+id/button_generate_otp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.0"
-                    android:text="Start Phone Auth" />
+                    android:text="Generate OTP" />
 
                 <Button
-                    android:id="@+id/button_verify_phone"
+                    android:id="@+id/button_verify_otp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.0"
