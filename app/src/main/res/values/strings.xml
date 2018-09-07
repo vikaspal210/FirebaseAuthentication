@@ -4,6 +4,7 @@
     <string name="firebase_status_fmt">Firebase User: %s</string>
     <string name="loading">Loading…</string>
     <string name="desc_google_sign_in">Use a Google Sign In credential to authenticate with Firebase.</string>
+    <string name="desc_phone">Use a OTP to verify phone and use credential to authenticate with Firebase.</string>
 
 
 </resources>

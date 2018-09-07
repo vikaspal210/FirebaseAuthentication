@@ -17,10 +17,12 @@ import android.widget.TextView;
 public class ChooserActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private static final Class[] CLASSES=new Class[]{
-            GoogleSignIn.class
+            GoogleSignIn.class,
+            PhoneAuthActivity.class
     };
     private static final int[] DESCRIPTION_IDS=new int[]{
-            R.string.desc_google_sign_in
+            R.string.desc_google_sign_in,
+            R.string.desc_phone
 
     };
 
