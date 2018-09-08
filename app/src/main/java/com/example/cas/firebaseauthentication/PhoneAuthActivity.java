@@ -21,19 +21,15 @@ import com.google.firebase.auth.PhoneAuthProvider;
 
 import java.util.concurrent.TimeUnit;
 
-public class PhoneAuthActivity extends AppCompatActivity {
+public class PhoneAuthActivity extends AppCompatActivity implements View.OnClickListener {
     //Views variable
-    Button btnGenerateOTP,btnVerifyOTP,btnSignOut;
     EditText etPhoneNumber, etOTP;
-    private TextView mDetailTextView;
-    private TextView mStatusTextView;
-
-    //otp, number variable
-    private String phoneNumber,otp;
-
     //Global variable for verification state change
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
-
+    private TextView mDetailTextView;
+    private TextView mStatusTextView;
+    //otp, number variable
+    private String phoneNumber, otp;
     //FreebaseAuth variable
     private FirebaseAuth auth;
 
@@ -47,66 +43,13 @@ public class PhoneAuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_phone_auth);
 
 
-
         //initializing views
         findViews();
 
         //start firebase login
         StartFirebaseLogin();
         updateUI(auth.getCurrentUser());
-
-        //generating otp
-
-        /*below lines will send an SMS to the provided phone number.
-        As verifyPhoneNumber() is reentrant,
-        it will not send another SMS on button click until the
-        original request is timed out.*/
-        btnGenerateOTP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    phoneNumber=etPhoneNumber.getText().toString();
-
-                    PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                            phoneNumber,
-                            60,
-                            TimeUnit.SECONDS,
-                            PhoneAuthActivity.this,
-                            mCallbacks);
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                    Toast.makeText(PhoneAuthActivity.this, "Please Enter Phone No with country code first", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        //sign in Button onClick
-        btnVerifyOTP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    //get entered otp from EditText for verification
-                    otp=etOTP.getText().toString();
-                    //verify using otp, verificationCode; should be same for success
-                    PhoneAuthCredential credential=PhoneAuthProvider.getCredential(verificationCode,otp);
-                    //sign in with caught credentials
-                    SigninWithPhone(credential);
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                }
-                updateUI(auth.getCurrentUser());
-            }
-        });
-
-        btnSignOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateUI(null);
-                auth.signOut();
-            }
-        });
-
-    }
+    }//onCreate() END
 
     //Sign in with phone method
     private void SigninWithPhone(PhoneAuthCredential credential) {
@@ -114,10 +57,10 @@ public class PhoneAuthActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             //make vidible sign out button , make invisible login layout
                             Toast.makeText(PhoneAuthActivity.this, "SignedIn, Correct OTP", Toast.LENGTH_SHORT).show();
-                        }else{
+                        } else {
                             Toast.makeText(PhoneAuthActivity.this, "Incorrect OTP", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -126,25 +69,21 @@ public class PhoneAuthActivity extends AppCompatActivity {
 
     //method to initialize views
     private void findViews() {
-        btnGenerateOTP=(Button)findViewById(R.id.button_generate_otp);
-        btnVerifyOTP=(Button)findViewById(R.id.button_verify_otp);
-        btnSignOut=(Button)findViewById(R.id.sign_out_button);
-
-        etPhoneNumber=(EditText)findViewById(R.id.edittext_phone_number);
-        etOTP=(EditText)findViewById(R.id.edittext_otp);
+        etPhoneNumber = (EditText) findViewById(R.id.edittext_phone_number);
+        etOTP = (EditText) findViewById(R.id.edittext_otp);
 
         mStatusTextView = findViewById(R.id.status);
         mDetailTextView = findViewById(R.id.detail);
     }
 
     //firebase login method
-    private void StartFirebaseLogin(){
+    private void StartFirebaseLogin() {
         //get FirebaseAuth instance
-        auth=FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         //OnVerificationStateChangedCallbacks
         //We have to override onVerificationCompleted & onVerificationFailed
-        mCallbacks=new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+        mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
                 // Check if user is signed in (non-null) and update UI accordingly.
@@ -161,7 +100,7 @@ public class PhoneAuthActivity extends AppCompatActivity {
             @Override
             public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
-                verificationCode=s;
+                verificationCode = s;
                 Toast.makeText(PhoneAuthActivity.this, "Code sent", Toast.LENGTH_SHORT).show();
             }
         };
@@ -180,14 +119,14 @@ public class PhoneAuthActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
-    private void updateUI(FirebaseUser currentLoggedUser){
-        if(currentLoggedUser!=null){
-            mStatusTextView.setText(getString(R.string.google_status_fmt,currentLoggedUser.getPhoneNumber()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt,currentLoggedUser.getUid()));
+    private void updateUI(FirebaseUser currentLoggedUser) {
+        if (currentLoggedUser != null) {
+            mStatusTextView.setText(getString(R.string.google_status_fmt, currentLoggedUser.getPhoneNumber()));
+            mDetailTextView.setText(getString(R.string.firebase_status_fmt, currentLoggedUser.getUid()));
             findViewById(R.id.login_linear_layout).setVisibility(View.GONE);
             findViewById(R.id.sign_out_linear_layout).setVisibility(View.VISIBLE);
 
-        }else{
+        } else {
             mStatusTextView.setText("Signed Out");
             mDetailTextView.setText(null);
             findViewById(R.id.login_linear_layout).setVisibility(View.VISIBLE);
@@ -195,4 +134,52 @@ public class PhoneAuthActivity extends AppCompatActivity {
         }
     }
 
+    //onClick
+
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        if (id == R.id.button_generate_otp) {
+
+            //generating otp button
+        /*below lines will send an SMS to the provided phone number.
+        As verifyPhoneNumber() is reentrant,
+        it will not send another SMS on button click until the
+        original request is timed out.*/
+            try {
+                phoneNumber = etPhoneNumber.getText().toString();
+
+                PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                        phoneNumber,
+                        60,
+                        TimeUnit.SECONDS,
+                        PhoneAuthActivity.this,
+                        mCallbacks);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                Toast.makeText(PhoneAuthActivity.this, "Please Enter Phone No with country code first", Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (id == R.id.button_verify_otp) {
+            //verify otp button
+            try {
+                //get entered otp from EditText for verification
+                otp = etOTP.getText().toString();
+                //verify using otp, verificationCode; should be same for success
+                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationCode, otp);
+                //sign in with caught credentials
+                SigninWithPhone(credential);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+            updateUI(auth.getCurrentUser());
+
+        } else if (id == R.id.sign_out_button) {
+            //sign out button
+            updateUI(null);
+            auth.signOut();
+        }
+    }
 }
