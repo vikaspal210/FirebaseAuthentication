@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="Phone Title Text" />
+            android:text="Firebase Phone Auth using OTP" />
 
         <TextView
             android:id="@+id/status"
@@ -45,7 +45,7 @@
         android:gravity="center_vertical">
 
         <LinearLayout
-            android:id="@+id/phone_auth_fields"
+            android:id="@+id/login_linear_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -107,7 +107,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/signed_in_buttons"
+            android:id="@+id/sign_out_linear_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"

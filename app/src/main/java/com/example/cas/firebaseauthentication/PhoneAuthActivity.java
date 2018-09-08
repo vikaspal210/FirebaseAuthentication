@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -13,6 +15,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
@@ -20,8 +23,10 @@ import java.util.concurrent.TimeUnit;
 
 public class PhoneAuthActivity extends AppCompatActivity {
     //Views variable
-    Button btnGenerateOTP,btnVerifyOTP;
+    Button btnGenerateOTP,btnVerifyOTP,btnSignOut;
     EditText etPhoneNumber, etOTP;
+    private TextView mDetailTextView;
+    private TextView mStatusTextView;
 
     //otp, number variable
     private String phoneNumber,otp;
@@ -41,11 +46,14 @@ public class PhoneAuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_auth);
 
+
+
         //initializing views
         findViews();
 
         //start firebase login
         StartFirebaseLogin();
+        updateUI(auth.getCurrentUser());
 
         //generating otp
 
@@ -56,14 +64,19 @@ public class PhoneAuthActivity extends AppCompatActivity {
         btnGenerateOTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                phoneNumber=etPhoneNumber.getText().toString();
+                try {
+                    phoneNumber=etPhoneNumber.getText().toString();
 
-                PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                        phoneNumber,
-                        60,
-                        TimeUnit.SECONDS,
-                        PhoneAuthActivity.this,
-                        mCallbacks);
+                    PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                            phoneNumber,
+                            60,
+                            TimeUnit.SECONDS,
+                            PhoneAuthActivity.this,
+                            mCallbacks);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                    Toast.makeText(PhoneAuthActivity.this, "Please Enter Phone No with country code first", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -71,12 +84,25 @@ public class PhoneAuthActivity extends AppCompatActivity {
         btnVerifyOTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //get entered otp from EditText for verification
-                otp=etOTP.getText().toString();
-                //verify using otp, verificationCode; should be same for success
-                PhoneAuthCredential credential=PhoneAuthProvider.getCredential(verificationCode,otp);
-                //sign in with caught credentials
-                SigninWithPhone(credential);
+                try {
+                    //get entered otp from EditText for verification
+                    otp=etOTP.getText().toString();
+                    //verify using otp, verificationCode; should be same for success
+                    PhoneAuthCredential credential=PhoneAuthProvider.getCredential(verificationCode,otp);
+                    //sign in with caught credentials
+                    SigninWithPhone(credential);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+                updateUI(auth.getCurrentUser());
+            }
+        });
+
+        btnSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUI(null);
+                auth.signOut();
             }
         });
 
@@ -102,9 +128,13 @@ public class PhoneAuthActivity extends AppCompatActivity {
     private void findViews() {
         btnGenerateOTP=(Button)findViewById(R.id.button_generate_otp);
         btnVerifyOTP=(Button)findViewById(R.id.button_verify_otp);
+        btnSignOut=(Button)findViewById(R.id.sign_out_button);
 
         etPhoneNumber=(EditText)findViewById(R.id.edittext_phone_number);
         etOTP=(EditText)findViewById(R.id.edittext_otp);
+
+        mStatusTextView = findViewById(R.id.status);
+        mDetailTextView = findViewById(R.id.detail);
     }
 
     //firebase login method
@@ -117,6 +147,9 @@ public class PhoneAuthActivity extends AppCompatActivity {
         mCallbacks=new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+                // Check if user is signed in (non-null) and update UI accordingly.
+                FirebaseUser currentUser = auth.getCurrentUser();
+                updateUI(currentUser);
                 Toast.makeText(PhoneAuthActivity.this, "verification completed", Toast.LENGTH_SHORT).show();
             }
 
@@ -133,5 +166,33 @@ public class PhoneAuthActivity extends AppCompatActivity {
             }
         };
     }//StartFirebaseLogin END
+
+    private void signOut() {
+        auth.signOut();
+        updateUI(null);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = auth.getCurrentUser();
+        updateUI(currentUser);
+    }
+
+    private void updateUI(FirebaseUser currentLoggedUser){
+        if(currentLoggedUser!=null){
+            mStatusTextView.setText(getString(R.string.google_status_fmt,currentLoggedUser.getPhoneNumber()));
+            mDetailTextView.setText(getString(R.string.firebase_status_fmt,currentLoggedUser.getUid()));
+            findViewById(R.id.login_linear_layout).setVisibility(View.GONE);
+            findViewById(R.id.sign_out_linear_layout).setVisibility(View.VISIBLE);
+
+        }else{
+            mStatusTextView.setText("Signed Out");
+            mDetailTextView.setText(null);
+            findViewById(R.id.login_linear_layout).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_out_linear_layout).setVisibility(View.GONE);
+        }
+    }
 
 }
